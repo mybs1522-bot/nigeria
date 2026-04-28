@@ -66,6 +66,24 @@ function PayPalButton({ email, onSuccess, amount }: { email: string; onSuccess: 
   return <div ref={containerRef} className="w-full" />;
 }
 
+function SelarButton({ email }: { email: string }) {
+  const handleSelar = () => {
+    const selarUrl = `https://selar.com/course3d?quickcheckout=1&email=${encodeURIComponent(email)}`;
+    window.open(selarUrl, '_blank');
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={handleSelar}
+      className="w-full py-3.5 bg-green-600 hover:bg-green-700 rounded-xl flex items-center justify-center gap-2.5 transition-all"
+    >
+      <span className="text-white text-lg">🇳🇬</span>
+      <span className="text-white font-bold text-base">Pay with Bank Transfer / Naira</span>
+    </button>
+  );
+}
+
 function CryptoButton({ email, amount }: { email: string; amount: string }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -198,7 +216,10 @@ function CheckoutForm({ email, onSuccess, onBack, amount }: CheckoutFormProps) {
 
   return (
     <div className="space-y-4">
-      {/* Pay with Crypto — always visible on top */}
+      {/* Pay with Selar (Bank Transfer / Naira) — top */}
+      <SelarButton email={email} />
+
+      {/* Pay with Crypto */}
       <CryptoButton email={email} amount={amount} />
 
       <div className="flex items-center gap-3">

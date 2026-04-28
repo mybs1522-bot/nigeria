@@ -51,9 +51,9 @@ const CtaWithTimer = ({ timeLeft, onClick, variant = 'green' }: { timeLeft: { h:
 
         {/* Price */}
         <div className="flex items-baseline gap-2">
-          <span className={`text-sm ${variant === 'dark' ? 'text-slate-500' : 'text-slate-400'} line-through font-bold`}>${FRONT_END_ORIGINAL_PRICE}</span>
-          <span className={`text-3xl font-display font-black ${variant === 'dark' ? 'text-white' : 'text-slate-900'}`}>${FRONT_END_PRICE}</span>
-          <span className="bg-orange-100 text-orange-500 text-[9px] font-bold px-1.5 py-0.5 rounded-full">91% OFF</span>
+          <span className={`text-sm ${variant === 'dark' ? 'text-slate-500' : 'text-slate-400'} line-through font-bold`}>₦99,000</span>
+          <span className={`text-3xl font-display font-black ${variant === 'dark' ? 'text-white' : 'text-slate-900'}`}>₦15,000</span>
+          <span className="bg-orange-100 text-orange-500 text-[9px] font-bold px-1.5 py-0.5 rounded-full">85% OFF</span>
         </div>
 
         {/* Button */}
@@ -78,7 +78,7 @@ const LandingPage: React.FC = () => {
 
   const [timeLeft, setTimeLeft] = useState(() => { const D = (3 * 3600 + 36 * 60 + 20) * 1000, r = D - (Date.now() % D); return { h: Math.floor((r / 3600000) % 24), m: Math.floor((r / 60000) % 60), s: Math.floor((r / 1000) % 60) }; });
   const [showStickyBar, setShowStickyBar] = useState(false);
-  useEffect(() => { window.scrollTo(0, 0); if ((window as any).fbq) (window as any).fbq('track', 'ViewContent', { content_name: 'Avada Design — SketchUp + V-Ray + D5 Render AI', value: FRONT_END_PRICE, currency: 'USD' }); }, []);
+  useEffect(() => { window.scrollTo(0, 0); if ((window as any).fbq) (window as any).fbq('track', 'ViewContent', { content_name: 'Avada Design — SketchUp + V-Ray + D5 Render AI', value: 15000, currency: 'NGN' }); }, []);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
   const [studentCount, setStudentCount] = useState(22390);
 
@@ -109,7 +109,7 @@ const LandingPage: React.FC = () => {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Logo />
           <div className="flex items-center gap-4">
-            <button onClick={openPaymentModal} className="text-white px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-widest hover:scale-105 transition-all premium-stroke" style={{ background: 'linear-gradient(135deg,#f97316,#ea580c)', boxShadow: '0 0 20px rgba(249,115,22,0.45)' }}>Get Access — ${FRONT_END_PRICE}</button>
+            <button onClick={openPaymentModal} className="text-white px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-widest hover:scale-105 transition-all premium-stroke" style={{ background: 'linear-gradient(135deg,#f97316,#ea580c)', boxShadow: '0 0 20px rgba(249,115,22,0.45)' }}>Get Access — ₦15,000</button>
           </div>
         </div>
       </header>
@@ -224,7 +224,7 @@ const LandingPage: React.FC = () => {
               {/* CTA */}
               <button onClick={openPaymentModal} className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-2xl font-bold text-base md:text-lg shadow-xl shadow-orange-500/20 hover:shadow-orange-500/30 hover:scale-[1.03] transition-all flex items-center justify-center gap-3 group premium-stroke">
                 <Download size={18} className="shrink-0" />
-                Get All 3 Courses — ${FRONT_END_PRICE} <ArrowRight className="group-hover:translate-x-1 transition-transform" size={18} />
+                Get All 3 Courses — ₦15,000 <ArrowRight className="group-hover:translate-x-1 transition-transform" size={18} />
               </button>
               <p className="text-[11px] md:text-xs text-slate-400 mt-3 font-medium">24/7 Support • Free AI Software • 7-Day Money-Back Guarantee</p>
 
@@ -334,7 +334,7 @@ const LandingPage: React.FC = () => {
         <section className="py-16 bg-white border-b border-slate-200">
           <div className="max-w-5xl mx-auto px-5">
             <div className="reveal text-center mb-10">
-              <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-900 tracking-tight mb-4">Your ${FRONT_END_PRICE} Investment <br className="hidden md:block" /><span className="text-orange-600">Pays for Itself 100x Over</span></h2>
+              <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-900 tracking-tight mb-4">Your ₦15,000 Investment <br className="hidden md:block" /><span className="text-orange-600">Pays for Itself 100x Over</span></h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {INCOME_TIERS.map((tier, i) => (
@@ -377,7 +377,7 @@ const LandingPage: React.FC = () => {
                   <span className="text-slate-900 font-bold text-center">Lifetime Access + Free Updates</span>
                 </div>
                 <button onClick={openPaymentModal} className="w-full sm:w-auto px-10 py-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl font-bold text-lg shadow-xl shadow-orange-500/20 hover:scale-[1.02] transition-all flex items-center justify-center gap-3 group premium-stroke whitespace-nowrap">
-                  <Download size={16} /> Get All 3 Courses — ${FRONT_END_PRICE} <ArrowRight className="group-hover:translate-x-1 transition-transform" size={18} />
+                  <Download size={16} /> Get All 3 Courses — ₦15,000 <ArrowRight className="group-hover:translate-x-1 transition-transform" size={18} />
                 </button>
               </div>
             </div>
@@ -428,12 +428,12 @@ const LandingPage: React.FC = () => {
                   <li className="flex items-center gap-3"><CheckCircle size={18} className="text-orange-500 shrink-0" /><span className="text-slate-800">24/7 support, free software links, and a community that's always got your back.</span></li>
                 </ul>
                 <div className="mt-6 pt-6 border-t border-orange-100 flex items-center justify-between">
-                  <span className="text-slate-600 text-sm italic font-bold">The complete design-to-render ecosystem for just ${FRONT_END_PRICE}.</span>
+                  <span className="text-slate-600 text-sm italic font-bold">The complete design-to-render ecosystem for just ₦15,000.</span>
                   <button onClick={openPaymentModal} className="text-orange-600 font-bold text-sm hover:text-orange-600 flex items-center gap-1 group">Get Started <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" /></button>
                 </div>
               </div>
 
-              <p className="text-slate-900 font-semibold text-lg md:text-xl border-l-4 border-orange-500 pl-4 bg-orange-50 p-4 rounded-r-xl">Stop collecting bookmarks. Start building a portfolio. 50,000+ students already did — and they started with the same ${FRONT_END_PRICE} decision you're about to make.</p>
+              <p className="text-slate-900 font-semibold text-lg md:text-xl border-l-4 border-orange-500 pl-4 bg-orange-50 p-4 rounded-r-xl">Stop collecting bookmarks. Start building a portfolio. 50,000+ students already did — and they started with the same ₦15,000 decision you're about to make.</p>
             </div>
           </div>
         </section>
@@ -442,7 +442,7 @@ const LandingPage: React.FC = () => {
         {/* 5. OLD vs NEW — The Contrast */}
         <section className="py-16 md:py-24 bg-white grid-bg">
           <div className="max-w-5xl mx-auto px-5">
-            <div className="reveal text-center mb-12"><h2 className="text-3xl md:text-5xl font-display font-bold text-slate-900 tracking-tight mb-4">The Slow, Expensive Path <br className="hidden md:block" />vs. <span className="text-orange-600">Our ${FRONT_END_PRICE} Shortcut</span></h2></div>
+            <div className="reveal text-center mb-12"><h2 className="text-3xl md:text-5xl font-display font-bold text-slate-900 tracking-tight mb-4">The Slow, Expensive Path <br className="hidden md:block" />vs. <span className="text-orange-600">Our ₦15,000 Shortcut</span></h2></div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="reveal grid-bg border border-red-200 rounded-2xl p-8 shadow-soft">
                 <div className="flex items-center gap-3 mb-6"><div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center"><X size={20} className="text-red-500" /></div><h3 className="text-xl font-bold text-red-500">The Old Struggle</h3></div>
@@ -456,7 +456,7 @@ const LandingPage: React.FC = () => {
                 </ul>
               </div>
               <div className="reveal bg-gradient-to-br from-orange-50 to-slate-50 border border-orange-200 rounded-2xl p-8 shadow-soft">
-                <div className="flex items-center gap-3 mb-6"><div className="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center"><CheckCircle size={20} className="text-orange-600" /></div><h3 className="text-xl font-bold text-slate-900">The ${FRONT_END_PRICE} Bundle</h3></div>
+                <div className="flex items-center gap-3 mb-6"><div className="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center"><CheckCircle size={20} className="text-orange-600" /></div><h3 className="text-xl font-bold text-slate-900">The ₦15,000 Bundle</h3></div>
                 <ul className="space-y-4">
                   {['SketchUp: Build 3D models from floor plans in minutes', 'V-Ray: One-click photorealistic lighting, materials & shadows', 'D5 Render AI: Real-time renders — see it as you design it', 'All software links provided — no expensive licenses needed', '24/7 team support — stuck on a render? We fix it with you'].map((item, i) => (
                     <li key={i} className="flex items-start gap-3 text-slate-700 text-sm"><CheckCircle size={14} className="text-orange-500 mt-1 shrink-0" />{item}</li>
@@ -534,7 +534,7 @@ const LandingPage: React.FC = () => {
           <div className="max-w-3xl mx-auto px-4 md:px-5">
             <div className="text-center mb-6 md:mb-8">
               <h3 className="text-xl md:text-3xl font-display font-bold text-slate-900 mb-2">Your future portfolio is one click away.</h3>
-              <p className="text-slate-500 text-xs md:text-sm">50,000+ students chose this path. SketchUp + V-Ray + D5 Render AI for ${FRONT_END_PRICE}. Lifetime access. Zero risk.</p>
+              <p className="text-slate-500 text-xs md:text-sm">50,000+ students chose this path. SketchUp + V-Ray + D5 Render AI for ₦15,000. Lifetime access. Zero risk.</p>
             </div>
             <CtaWithTimer timeLeft={timeLeft} onClick={openPaymentModal} variant="dark" />
           </div>
@@ -560,7 +560,7 @@ const LandingPage: React.FC = () => {
           {/* Left: price + timer */}
           <div className="flex flex-col items-start gap-0.5 shrink-0">
             <div className="flex items-baseline gap-1.5">
-              <span className="text-base font-black text-slate-900">${FRONT_END_PRICE}</span>
+              <span className="text-base font-black text-slate-900">₦15,000</span>
               <span className="text-[10px] font-black text-slate-900 uppercase tracking-wide">Offer ends in</span>
             </div>
             <div className="flex items-center gap-0.5">
@@ -577,7 +577,7 @@ const LandingPage: React.FC = () => {
           <div className="flex-1 flex flex-col gap-1">
             <button onClick={openPaymentModal} className="flex-1 flex items-center justify-center gap-1.5 bg-slate-900 text-white text-xs font-bold py-3 rounded-xl hover:bg-black transition-all"
               style={{ boxShadow: '0 0 0 2px #f97316, 0 0 12px rgba(249,115,22,0.35)' }}>
-              Get All 3 Courses — ${FRONT_END_PRICE}
+              Get All 3 Courses — ₦15,000
               <ArrowRight size={13} />
             </button>
           </div>

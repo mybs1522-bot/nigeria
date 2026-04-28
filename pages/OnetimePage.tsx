@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { UPSELL_COURSES, UPSELL_PRICE, UPSELL_ORIGINAL_PRICE } from "../constants";
-import { Sparkles, Timer, CheckCircle2, Download, Mail, Lock, Check, X, ArrowRight, Gift, Zap, Star, ShieldCheck } from "lucide-react";
-import ModernPaymentForm from "../components/ui/modern-payment-form";
+import { Sparkles, Timer, CheckCircle2, Download, Mail, Lock, Check, X, ArrowRight, Gift, Zap, Star, ShieldCheck, User } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { chargeSavedCardUpsell } from "../services/stripe";
 import { sendStageEmail } from "../services/email";
 import FunnelProgressBar from "../components/FunnelProgressBar";
 
@@ -16,20 +14,24 @@ const OnetimePage: React.FC = () => {
   // Support crypto redirect: email comes from URL params when returning from NOWPayments
   const searchParams = new URLSearchParams(location.search);
   const isCryptoSuccess = searchParams.get('crypto') === 'success';
-  const emailFromState = location.state?.email ?? searchParams.get('email') ?? '';
+  const emailFromState = location.state?.email ?? searchParams.get('email') ?? sessionStorage.getItem('checkout_email') ?? '';
+  const nameFromState = location.state?.fullName ?? searchParams.get('fullname') ?? sessionStorage.getItem('checkout_fullname') ?? '';
   const [timeLeft, setTimeLeft] = useState({ m: 9, s: 59 });
   const [email, setEmail] = useState(emailFromState);
+  const [fullName, setFullName] = useState(nameFromState);
   const [showPayment, setShowPayment] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [isProcessingUpSell, setIsProcessingUpSell] = useState(false);
   const [isConfirmingSkip, setIsConfirmingSkip] = useState(false);
+  const [nameError, setNameError] = useState(false);
+  const [emailError, setEmailError] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    if ((window as any).fbq) (window as any).fbq("track", "ViewContent", { content_name: "Avada Upsell", value: UPSELL_PRICE, currency: "USD" });
+    if ((window as any).fbq) (window as any).fbq("track", "ViewContent", { content_name: "Avada Upsell", value: 37000, currency: "NGN" });
     // If arriving from crypto payment, fire purchase event
     if (isCryptoSuccess && emailFromState) {
-      if ((window as any).fbq) (window as any).fbq("track", "Purchase", { value: 9, currency: "USD" });
+      if ((window as any).fbq) (window as any).fbq("track", "Purchase", { value: 37000, currency: "NGN" });
       sendStageEmail(emailFromState, 'render');
     }
   }, []);
@@ -54,7 +56,7 @@ const OnetimePage: React.FC = () => {
   const f = (v: number) => v.toString().padStart(2, "0");
 
   const handleSuccess = (newCustomerId?: string, newPaymentMethodId?: string) => {
-    if ((window as any).fbq) (window as any).fbq("track", "Purchase", { value: UPSELL_PRICE, currency: "USD" });
+    if ((window as any).fbq) (window as any).fbq("track", "Purchase", { value: 37000, currency: "NGN" });
     sendStageEmail(email, 'full');
     navigate("/offer", { state: { customerId: newCustomerId ?? customerId, paymentMethodId: newPaymentMethodId ?? paymentMethodId, paymentIntentId, email } });
   };
@@ -63,24 +65,19 @@ const OnetimePage: React.FC = () => {
     navigate("/offer", { state: { customerId, paymentMethodId, paymentIntentId, email } });
   };
 
-  const handleCTA = async () => {
-    console.log('[OnetimePage] handleCTA called. customerId:', customerId, 'paymentMethodId:', paymentMethodId, 'paymentIntentId:', paymentIntentId);
-    if (customerId) {
-      setIsProcessingUpSell(true);
-      try {
-        await chargeSavedCardUpsell(customerId, `$${UPSELL_PRICE}`, paymentMethodId, paymentIntentId);
-        handleSuccess();
-      } catch (err) {
-        console.error("One-click upsell failed", err);
-        setIsProcessingUpSell(false);
-        setShowPayment(true);
-        setIsConfirmingSkip(false);
-      }
-    } else {
-      console.warn('[OnetimePage] No customerId — showing payment form as fallback');
+  const handleSelarCheckout = () => {
+    const nameValid = fullName.trim().length >= 2;
+    const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    setNameError(!nameValid);
+    setEmailError(!emailValid);
+    if (!nameValid || !emailValid) {
       setShowPayment(true);
-      setIsConfirmingSkip(false);
+      return;
     }
+    sessionStorage.setItem('checkout_fullname', fullName.trim());
+    sessionStorage.setItem('checkout_email', email);
+    const selarUrl = `https://selar.com/9courses?quickcheckout=1&email=${encodeURIComponent(email)}&fullname=${encodeURIComponent(fullName.trim())}&currency=NGN`;
+    window.location.href = selarUrl;
   };
 
   return (
@@ -133,27 +130,27 @@ const OnetimePage: React.FC = () => {
                 <p className="text-gray-500 text-sm">9 Additional Premium Courses</p>
               </div>
               <div className="text-right">
-                <span className="text-gray-400 text-lg line-through mr-2">${UPSELL_ORIGINAL_PRICE}</span>
-                <span className="text-4xl font-display font-black text-gray-900">${UPSELL_PRICE}</span>
+                <span className="text-gray-400 text-lg line-through mr-2">₦99,000</span>
+                <span className="text-4xl font-display font-black text-gray-900">₦37,000</span>
               </div>
             </div>
             <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-2">
               <Zap size={14} className="text-emerald-500" />
-              <span className="text-sm font-semibold text-emerald-700">You save ${UPSELL_ORIGINAL_PRICE - UPSELL_PRICE} — that's 86% off!</span>
+              <span className="text-sm font-semibold text-emerald-700">You save ₦62,000 — that's 63% off!</span>
             </div>
           </div>
         </div>
         {/* ─── SECONDARY CTA (Above Grid) ─── */}
         <div className="upsell-fade mb-8 w-full max-w-xl mx-auto" style={{ animationDelay: '0.2s' }}>
           <button
-            disabled={isProcessingUpSell}
-            onClick={handleCTA}
-            className="w-full py-4 text-white font-bold text-lg rounded-2xl flex items-center justify-center gap-3 active:scale-[0.98] btn-pulse disabled:opacity-70 disabled:cursor-wait"
+            onClick={handleSelarCheckout}
+            className="w-full py-4 text-white font-bold text-lg rounded-2xl flex items-center justify-center gap-3 active:scale-[0.98] btn-pulse"
             style={{ background: 'linear-gradient(135deg,#f97316,#ea580c)' }}
           >
+            <span className="text-lg">🇳🇬</span>
             <Gift size={20} />
-            {isProcessingUpSell ? "Processing Upgrade..." : "Yes! Unlock All 9 Courses Now"}
-            {!isProcessingUpSell && <ArrowRight size={20} />}
+            Yes! Unlock All 9 Courses — ₦37,000
+            <ArrowRight size={20} />
           </button>
           <button
             onClick={() => {
@@ -221,13 +218,13 @@ const OnetimePage: React.FC = () => {
           <div className="space-y-3">
             {/* Primary CTA */}
             <button
-              disabled={isProcessingUpSell}
-              onClick={handleCTA}
-              className="w-full py-4 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold text-lg rounded-2xl flex items-center justify-center gap-3 group active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-wait btn-pulse"
+              onClick={handleSelarCheckout}
+              className="w-full py-4 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold text-lg rounded-2xl flex items-center justify-center gap-3 group active:scale-[0.98] transition-all btn-pulse"
             >
+              <span className="text-lg">🇳🇬</span>
               <Gift size={20} />
-              {isProcessingUpSell ? "Processing Upgrade..." : "Yes! I want it."}
-              {!isProcessingUpSell && <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />}
+              Yes! Unlock All 9 Courses — ₦37,000
+              <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
             </button>
 
             <button
@@ -235,7 +232,7 @@ const OnetimePage: React.FC = () => {
                 const el = document.getElementById('final-bottom-cta');
                 if (el) el.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="block w-full py-3 text-center text-gray-500 hover:text-gray-700 text-sm font-medium transition-colors underline underline-offset-4 decoration-gray-300 disabled:opacity-50"
+              className="block w-full py-3 text-center text-gray-500 hover:text-gray-700 text-sm font-medium transition-colors underline underline-offset-4 decoration-gray-300"
             >
               No thanks, I'll stick with my 3 courses →
             </button>
@@ -335,19 +332,19 @@ const OnetimePage: React.FC = () => {
         {/* ─── SECONDARY CTA (Jump to payment) ─── */}
         <div id="final-bottom-cta" className="upsell-fade mb-10 w-full max-w-xl mx-auto" style={{ animationDelay: '0.12s' }}>
           <button
-            disabled={isProcessingUpSell}
-            onClick={handleCTA}
-            className="w-full py-4 text-white font-bold text-lg rounded-2xl flex items-center justify-center gap-3 active:scale-[0.98] btn-pulse disabled:opacity-70 disabled:cursor-wait"
+            onClick={handleSelarCheckout}
+            className="w-full py-4 text-white font-bold text-lg rounded-2xl flex items-center justify-center gap-3 active:scale-[0.98] btn-pulse"
             style={{ background: 'linear-gradient(135deg,#f97316,#ea580c)' }}
           >
+            <span className="text-lg">🇳🇬</span>
             <Gift size={20} />
-            {isProcessingUpSell ? "Processing Upgrade..." : "Yes! Unlock All 9 Courses Now"}
-            {!isProcessingUpSell && <ArrowRight size={20} />}
+            Yes! Unlock All 9 Courses — ₦37,000
+            <ArrowRight size={20} />
           </button>
 
           <button
             onClick={() => setIsConfirmingSkip(true)}
-            className="block w-full mt-4 py-3 text-center text-gray-500 hover:text-gray-700 text-sm font-medium transition-colors underline underline-offset-4 decoration-gray-300 disabled:opacity-50"
+            className="block w-full mt-4 py-3 text-center text-gray-500 hover:text-gray-700 text-sm font-medium transition-colors underline underline-offset-4 decoration-gray-300"
           >
             No thanks, I'll stick with my 3 courses →
           </button>
@@ -361,8 +358,20 @@ const OnetimePage: React.FC = () => {
             <button onClick={() => setShowPayment(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><X size={20}/></button>
             <div className="flex items-center justify-between mb-4 mt-2">
               <h3 className="text-lg font-bold text-gray-900">Complete Your Upgrade</h3>
-              <div className="bg-orange-100 text-orange-600 text-xs font-bold px-3 py-1 rounded-full">${UPSELL_PRICE}</div>
+              <div className="bg-orange-100 text-orange-600 text-xs font-bold px-3 py-1 rounded-full">₦37,000</div>
             </div>
+            <label className="block text-sm font-bold text-gray-900 mb-1.5">Full Name</label>
+            <div className="relative mb-3">
+              <User size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="John Doe"
+                value={fullName}
+                onChange={(e) => { setFullName(e.target.value); setNameError(false); }}
+                className={`w-full pl-10 pr-4 py-3 bg-gray-50 border-2 ${nameError ? 'border-red-500' : 'border-gray-200'} rounded-xl text-sm font-medium text-gray-900 focus:outline-none transition-all`}
+              />
+            </div>
+            {nameError && <p className="text-red-500 text-[10px] mb-2 font-bold">Enter your full name</p>}
             <label className="block text-sm font-bold text-gray-900 mb-1.5">Email</label>
             <div className="relative mb-3">
               <Mail size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -370,11 +379,19 @@ const OnetimePage: React.FC = () => {
                 type="email"
                 placeholder="your@email.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-sm font-medium text-gray-900 focus:outline-none transition-all"
+                onChange={(e) => { setEmail(e.target.value); setEmailError(false); }}
+                className={`w-full pl-10 pr-4 py-3 bg-gray-50 border-2 ${emailError ? 'border-red-500' : 'border-gray-200'} rounded-xl text-sm font-medium text-gray-900 focus:outline-none transition-all`}
               />
             </div>
-            <ModernPaymentForm bare email={email} onSuccess={handleSuccess} amount={`$${UPSELL_PRICE}`} />
+            {emailError && <p className="text-red-500 text-[10px] mb-2 font-bold">Enter a valid email address</p>}
+            <button
+              type="button"
+              onClick={handleSelarCheckout}
+              className="w-full py-4 bg-green-600 hover:bg-green-700 rounded-xl flex items-center justify-center gap-2.5 transition-all"
+            >
+              <span className="text-white text-lg">🇳🇬</span>
+              <span className="text-white font-bold text-base">Pay ₦37,000 · Get Instant Access</span>
+            </button>
           </div>
         </div>
       )}
@@ -385,18 +402,16 @@ const OnetimePage: React.FC = () => {
             <button onClick={() => setIsConfirmingSkip(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><X size={20}/></button>
             <h4 className="text-red-700 font-bold text-2xl mb-2 mt-4">Are you sure?</h4>
             <p className="text-gray-700 text-base mb-6">
-              This 86% discount will not be available again. You can still buy this later, but it will be at the full regular price (${UPSELL_ORIGINAL_PRICE}).
+              This 85% discount will not be available again. You can still buy this later, but it will be at the full regular price (₦99,000).
             </p>
             <div className="space-y-3">
               <button
-                disabled={isProcessingUpSell}
-                onClick={handleCTA}
+                onClick={handleSelarCheckout}
                 className="w-full py-4 bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-500/20 text-white font-bold text-lg rounded-xl transition-all"
               >
-                {isProcessingUpSell ? "Processing..." : "Yes, I want the discount"}
+                Yes, I want the discount
               </button>
               <button
-                disabled={isProcessingUpSell}
                 onClick={() => navigate("/offer", { state: { customerId, paymentMethodId, email } })}
                 className="block w-full py-3 text-center text-red-500 hover:text-red-700 text-sm font-bold transition-colors underline underline-offset-4 decoration-red-200"
               >

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { FRONT_END_COURSES, FRONT_END_PRICE, FRONT_END_ORIGINAL_PRICE } from "../constants";
-import { Sparkles, Timer, CheckCircle2, Download, Mail, Lock, Check, X, ArrowLeft } from "lucide-react";
-import ModernPaymentForm from "../components/ui/modern-payment-form";
+import { FRONT_END_COURSES, FRONT_END_ORIGINAL_PRICE } from "../constants";
+import { Sparkles, Timer, CheckCircle2, Download, Mail, Lock, Check, X, ArrowLeft, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { sendStageEmail } from "../services/email";
 
@@ -9,14 +8,16 @@ const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
   const [timeLeft, setTimeLeft] = useState({ h: 1, m: 19, s: 59 });
   const [email, setEmail] = useState("");
+  const [fullName, setFullName] = useState("");
   const [emailError, setEmailError] = useState(false);
+  const [nameError, setNameError] = useState(false);
   const [studentCount, setStudentCount] = useState(22847);
 
   useEffect(() => { const t = setInterval(() => setStudentCount(c => c + 1), 4000); return () => clearInterval(t); }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    if ((window as any).fbq) (window as any).fbq("track", "ViewContent", { content_name: "Avada Checkout", value: FRONT_END_PRICE, currency: "USD" });
+    if ((window as any).fbq) (window as any).fbq("track", "ViewContent", { content_name: "Avada Checkout", value: 15000, currency: "NGN" });
   }, []);
 
   useEffect(() => {
@@ -32,7 +33,7 @@ const CheckoutPage: React.FC = () => {
 
   const handleSuccess = (customerId?: string, paymentMethodId?: string, paymentIntentId?: string) => {
     console.log('[CheckoutPage] Payment succeeded. customerId:', customerId, 'paymentMethodId:', paymentMethodId, 'paymentIntentId:', paymentIntentId);
-    if ((window as any).fbq) (window as any).fbq("track", "Purchase", { value: FRONT_END_PRICE, currency: "USD" });
+    if ((window as any).fbq) (window as any).fbq("track", "Purchase", { value: 15000, currency: "NGN" });
     sendStageEmail(email, 'render');
     navigate("/onetime", { state: { customerId, paymentMethodId, paymentIntentId, email } });
   };
@@ -74,9 +75,9 @@ const CheckoutPage: React.FC = () => {
           </div>
           <h3 className="text-xl font-display font-bold mb-1">SketchUp + V-Ray + D5 Render</h3>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-display font-black">${FRONT_END_PRICE}</span>
-            <span className="text-gray-500 text-sm line-through">${FRONT_END_ORIGINAL_PRICE}</span>
-            <span className="bg-white/10 text-white text-xs font-bold px-2 py-0.5 rounded-full border border-white/20">91% OFF</span>
+            <span className="text-2xl font-display font-black">₦15,000</span>
+            <span className="text-gray-500 text-sm line-through">₦99,000</span>
+            <span className="bg-white/10 text-white text-xs font-bold px-2 py-0.5 rounded-full border border-white/20">85% OFF</span>
           </div>
         </div>
 
@@ -102,21 +103,60 @@ const CheckoutPage: React.FC = () => {
             </div>
           </div>
 
+          <label className="block text-xl font-black text-gray-900 mb-2">Full Name</label>
+          <div className="relative mb-3">
+            <User size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="John Doe"
+              value={fullName}
+              autoFocus
+              onChange={(e) => { setFullName(e.target.value); setNameError(false); }}
+              className={`w-full pl-10 pr-4 py-3.5 bg-white border-2 ${nameError ? "border-red-500" : "border-gray-900"} rounded-xl text-sm font-medium focus:outline-none transition-all`}
+            />
+          </div>
+          {nameError && <p className="text-red-500 text-[10px] mb-2 font-bold">Enter your full name</p>}
+
           <label className="block text-xl font-black text-gray-900 mb-2">Email</label>
-          <div className="relative mb-1">
+          <div className="relative mb-3">
             <Mail size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="email"
               placeholder="your@email.com"
               value={email}
-              autoFocus
               onChange={(e) => { setEmail(e.target.value); setEmailError(false); }}
               className={`w-full pl-10 pr-4 py-3.5 bg-white border-2 ${emailError ? "border-red-500" : "border-gray-900"} rounded-xl text-sm font-medium focus:outline-none transition-all`}
             />
           </div>
           {emailError && <p className="text-red-500 text-[10px] mb-2 font-bold">Enter a valid email address</p>}
 
-          <ModernPaymentForm bare email={email} onSuccess={handleSuccess} amount={`$${FRONT_END_PRICE}`} />
+          <button
+            type="button"
+            onClick={() => {
+              const nameValid = fullName.trim().length >= 2;
+              const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+              setNameError(!nameValid);
+              setEmailError(!emailValid);
+              if (!nameValid || !emailValid) return;
+              sessionStorage.setItem('checkout_fullname', fullName.trim());
+              sessionStorage.setItem('checkout_email', email);
+              const redirectUrl = `${window.location.origin}/onetime`;
+              const selarUrl = `https://selar.com/course3d?quickcheckout=1&email=${encodeURIComponent(email)}&fullname=${encodeURIComponent(fullName.trim())}&currency=NGN&redirect_url=${encodeURIComponent(redirectUrl)}`;
+              window.location.href = selarUrl;
+            }}
+            className="w-full py-4 bg-green-600 hover:bg-green-700 rounded-xl flex items-center justify-center gap-2.5 transition-all"
+          >
+            <span className="text-white text-lg">🇳🇬</span>
+            <span className="text-white font-bold text-base">Pay ₦15,000 · Get Instant Access</span>
+          </button>
+
+          <div className="flex items-center justify-center gap-4 mt-4 text-[10px] text-gray-400 font-medium uppercase tracking-wide">
+            <span className="flex items-center gap-1"><Lock size={10} /> Secured</span>
+            <span>•</span>
+            <span>7-Day Refund</span>
+            <span>•</span>
+            <span>Lifetime Access</span>
+          </div>
 
           <div className="flex items-center justify-center gap-1.5 mt-4 text-[11px] text-gray-500 font-medium text-center">
             🎓 Skill Certificate will be automatically mailed after you complete the course.
